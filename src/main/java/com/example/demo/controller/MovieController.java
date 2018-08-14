@@ -7,18 +7,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -41,14 +37,13 @@ public class MovieController {
 	@Inject
 	RatingRepository ratingRepository;
 
-
 	@GetMapping("/hello")
 	public String getHello() {
-		Customer c1 = new Customer(1l, "Ram", "sahu");
-		Customer c2 = new Customer(2l, "Ram2", "sahu");
-		Customer c3 = new Customer(3l, "Ram3", "sahu");
-		Customer c4 = new Customer(4l, "Ram4", "sahu");
-		List<Customer> list = new ArrayList<Customer>(); 
+		Customer c1 = new Customer(1l, "Hrithik", "Roshan");
+		Customer c2 = new Customer(2l, "Amir", "Khan");
+		Customer c3 = new Customer(3l, "Shah", "Feku");
+		Customer c4 = new Customer(4l, "Salu", "saMhu");
+		List<Customer> list = new ArrayList<Customer>();
 		list.add(c1);
 		list.add(c2);
 		list.add(c3);
@@ -62,17 +57,17 @@ public class MovieController {
 		return customerRepository.findAll();
 	}
 
-	@GetMapping("/movie/findOne")
+	@GetMapping(value = "/movie/findOne")
 	public Movie getMovie() {
 		return movieRepository.findOne(1l);
 	}
 
-	@GetMapping("/rating")
+	@GetMapping(value = "/rating", produces = MediaType.APPLICATION_JSON)
 	public List<Rating> setRating() {
 		Movie m = new Movie("DOn1");
 		Movie m2 = new Movie("DOn2");
 		Movie m3 = new Movie("DOn3");
-		Rating r = new Rating(3, 2l, m);
+		Rating r = new Rating(5, 2l, m);
 		Rating r2 = new Rating(3, 4l, m2);
 		Rating r3 = new Rating(5, 4l, m2);
 		Rating r4 = new Rating(2, 2l, m3);
@@ -87,24 +82,27 @@ public class MovieController {
 		ratingRepository.save(ratingList);
 		return ratingRepository.findAll();
 	}
-
-	@GetMapping("/customer/{customerId}/rate/{rating}")
-	public Response saveRating(@PathParam(value = "customerId") long customerId, @PathParam(value = "rating") int value,
-			@HeaderParam(value = "movie") String movieName) {
-		Rating r = null;
+/**
+ * Use ResponseEntity to get the appropriate response i.e-only response body
+ * Response can be used as output but it will give complete and unnecessary information
+ * 
+ * */
+	@GetMapping(value = "/customer/{customerId}/rate/{rating}")
+	public ResponseEntity saveRating(@PathVariable(value = "customerId") Long customerId,
+			@PathVariable(value = "rating") Integer value, @RequestHeader(value = "movie") String movieName) {
+		Rating rating = null;
 		try {
 			Movie m = new Movie(movieName);
-			r = new Rating(value, customerId, m);
-			r = ratingRepository.save(r);
+			rating = new Rating(value, customerId, m);
+			rating = ratingRepository.save(rating);
 		} catch (IllegalArgumentException e) {
-			return Response.status(Response.Status.BAD_REQUEST).entity("Bad Request").build();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-
-		return Response.ok(r, MediaType.APPLICATION_JSON).build();
+		return new ResponseEntity<>(rating, HttpStatus.OK);
 	}
 
-	@GetMapping("/highestRatedMovie/imperative")
-	public Response highestRatedMovie() {
+	@GetMapping(value = "/highestRatedMovie/imperative")
+	public ResponseEntity highestRatedMovie() {
 		Movie highestAverageMovie = null;
 		double highestAvg = 0;
 		List<Rating> ratings = ratingRepository.findAll();
@@ -114,7 +112,7 @@ public class MovieController {
 				List<Rating> ratingList = map.get(rating.getMovie());
 				ratingList.add(rating);
 			} else {
-				List<Rating> ratingList = new ArrayList<>(); 
+				List<Rating> ratingList = new ArrayList<>();
 				ratingList.add(rating);
 				map.put(rating.getMovie(), ratingList);
 			}
@@ -125,59 +123,53 @@ public class MovieController {
 				totalRatings += r.getValue();
 			double doubleAverageRating = ((double) totalRatings) / ratingsMap.getValue().size();
 			if (doubleAverageRating > highestAvg) {
-				highestAvg=doubleAverageRating;
-				highestAverageMovie=ratingsMap.getKey();
+				highestAvg = doubleAverageRating;
+				highestAverageMovie = ratingsMap.getKey();
 			}
 		}
-		if (highestAverageMovie==null) {
-			return Response.status(Response.Status.NOT_FOUND).entity("No Review found for any movie").build();
-		}else {
-			return Response.ok(highestAverageMovie).build();
+		if (highestAverageMovie == null) {
+			return new ResponseEntity<>("No Review found for any movie",HttpStatus.NOT_FOUND);
+		} else {
+			return new ResponseEntity<>(highestAverageMovie, HttpStatus.OK);
 		}
 	}
 
-	@PostMapping("/highestRatedMovie/functional")
-	public Response highestRatedMovieInFunctionalType() {
+	@GetMapping(value = "/highestRatedMovie/functional", produces = MediaType.APPLICATION_JSON)
+	public ResponseEntity highestRatedMovieInFunctionalType() {
 		List<Rating> ratings = ratingRepository.findAll();
-		double highRatingValue = 0;
-		Map<Movie, List<Rating>> ratingsGroupByMovie = ratings.stream().collect(Collectors.groupingBy(Rating::getMovie));
-		Map<Movie,Double> avarage = 
-				ratingsGroupByMovie.entrySet()
-			              .stream()
-			              .collect(Collectors.toMap(Map.Entry::getKey,
-			                                        e-> e.getValue()
-			                                             .stream()
-			                                             .mapToInt(Rating::getValue)
-			                                             .average()
-			                                             .getAsDouble()));
-		Movie highestAverageMovie = avarage.entrySet().stream()
-		  .max(Map.Entry.comparingByValue()).get().getKey();
-		if (highestAverageMovie==null) {
-			return Response.status(Response.Status.NOT_FOUND).entity("No Review found for any movie").build();
-		}else {
-			return Response.ok(highestAverageMovie).build();
+		Map<Movie, List<Rating>> ratingsGroupByMovie = ratings.stream()
+				.collect(Collectors.groupingBy(Rating::getMovie));
+		Map<Movie, Double> avarage = ratingsGroupByMovie.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
+				e -> e.getValue().stream().mapToInt(Rating::getValue).average().getAsDouble()));
+		Movie highestAverageMovie = avarage.entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
+		if (highestAverageMovie == null) {
+			return new ResponseEntity<>("No Review found for any movie",HttpStatus.NOT_FOUND);
+		} else {
+			return new ResponseEntity<>(highestAverageMovie, HttpStatus.OK);
 		}
 	}
-	
+
 	@PostMapping("/highestRatedCustomer/{id}")
-	public Response highestRatedGivenByCustomerForMovie(Movie movie,@PathParam(value = "id") long customerId) {
+	public ResponseEntity highestRatedGivenByCustomerForMovie(Movie movie, @PathVariable(value = "id") Long customerId) {
 		List<Rating> ratings = ratingRepository.findAll();
 		List<Rating> ratingsListFilteredOnMovie = ratings.stream()
-				.filter(p->p.getMovie().getName().equals(movie.getName())).collect(Collectors.toList());
+				.filter(p -> p.getMovie().getName().equals(movie.getName())).collect(Collectors.toList());
 		int maxRatings = ratingsListFilteredOnMovie.stream().mapToInt(Rating::getValue).max().getAsInt();
 		double averageRatingOfMovie = ratings.stream().mapToInt(Rating::getValue).average().getAsDouble();
-		List<Rating> ratingsHighestRated = ratingsListFilteredOnMovie.stream().filter(p->p.getValue()==maxRatings).collect(Collectors.toList());
-		ArrayList<Customer> personList= new ArrayList<>();
-		ratingsHighestRated.stream().forEach(p->{
-			Customer customer=customerRepository.findOne(p.getCustomerId());
-			double averageRatingOfUser =ratings.stream().filter(rating->rating.getCustomerId()==customerId).mapToInt(Rating::getValue).average().getAsDouble();
+		List<Rating> ratingsHighestRated = ratingsListFilteredOnMovie.stream().filter(p -> p.getValue() == maxRatings)
+				.collect(Collectors.toList());
+		ArrayList<Customer> personList = new ArrayList<>();
+		ratingsHighestRated.stream().forEach(p -> {
+			Customer customer = customerRepository.findOne(p.getCustomerId());
+			double averageRatingOfUser = ratings.stream().filter(rating -> rating.getCustomerId() == customerId)
+					.mapToInt(Rating::getValue).average().getAsDouble();
 			customer.setCustomerAverageRating(averageRatingOfUser);
 			customer.setMovieAverageRating(averageRatingOfMovie);
 			personList.add(customer);
 		});
-		
-		 return Response.ok(personList).build();
-		
+
+		return new ResponseEntity<>(personList, HttpStatus.OK);
+
 	}
 
 }
