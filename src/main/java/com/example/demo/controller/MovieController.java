@@ -38,7 +38,7 @@ public class MovieController {
 	RatingRepository ratingRepository;
 
 	@GetMapping("/hello")
-	public String getHello() {
+	public String loadCustomer() {
 		Customer c1 = new Customer(1l, "Hrithik", "Roshan");
 		Customer c2 = new Customer(2l, "Amir", "Khan");
 		Customer c3 = new Customer(3l, "Shah", "Feku");
@@ -63,7 +63,7 @@ public class MovieController {
 	}
 
 	@GetMapping(value = "/rating", produces = MediaType.APPLICATION_JSON)
-	public List<Rating> setRating() {
+	public List<Rating> loadRating() {
 		Movie m = new Movie("DOn1");
 		Movie m2 = new Movie("DOn2");
 		Movie m3 = new Movie("DOn3");
