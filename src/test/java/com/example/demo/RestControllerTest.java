@@ -43,8 +43,23 @@ public class RestControllerTest {
 	            .andExpect(status().isOk());
 	    }
 	 @Test
-	    public void getAllLogs()throws Exception {
+	    public void getAll()throws Exception {
 	        restLogsMockMvc.perform(get("/rest/all"))
+	            .andExpect(status().isOk());
+	    }
+	 @Test
+	    public void testGetMovie()throws Exception {
+	        restLogsMockMvc.perform(get("/rest/movie/findOne"))
+	            .andExpect(status().isOk());
+	    }
+	 @Test
+	    public void testHighestRatedMovie()throws Exception {
+	        restLogsMockMvc.perform(get("/rest/highestRatedMovie/imperative"))
+	            .andExpect(status().isOk());
+	    }
+	 @Test
+	    public void testHighestRatedMovieInFunctionalType()throws Exception {
+	        restLogsMockMvc.perform(get("/rest/highestRatedMovie/functional"))
 	            .andExpect(status().isOk());
 	    }
 
