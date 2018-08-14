@@ -48,15 +48,11 @@ public class MovieController {
 		Customer c2 = new Customer(2l, "Ram2", "sahu");
 		Customer c3 = new Customer(3l, "Ram3", "sahu");
 		Customer c4 = new Customer(4l, "Ram4", "sahu");
-		List<Customer> list = new ArrayList<Customer>() {
-			{
-				add(c1);
-				add(c2);
-				add(c3);
-				add(c4);
-
-			}
-		};
+		List<Customer> list = new ArrayList<Customer>(); 
+		list.add(c1);
+		list.add(c2);
+		list.add(c3);
+		list.add(c4);
 		customerRepository.save(list);
 		return "Hello World!";
 	}
@@ -66,7 +62,7 @@ public class MovieController {
 		return customerRepository.findAll();
 	}
 
-	@GetMapping("/movie/all")
+	@GetMapping("/movie/findOne")
 	public Movie getMovie() {
 		return movieRepository.findOne(1l);
 	}
@@ -115,14 +111,11 @@ public class MovieController {
 		HashMap<Movie, List<Rating>> map = new HashMap<Movie, List<Rating>>();
 		for (Rating rating : ratings) {
 			if (map.containsKey(rating.getMovie())) {
-				List<Rating> ratingList = (List<Rating>) map.get(rating.getMovie());
+				List<Rating> ratingList = map.get(rating.getMovie());
 				ratingList.add(rating);
 			} else {
-				List<Rating> ratingList = new ArrayList() {
-					{
-						add(rating);
-					}
-				};
+				List<Rating> ratingList = new ArrayList<>(); 
+				ratingList.add(rating);
 				map.put(rating.getMovie(), ratingList);
 			}
 		}
@@ -171,13 +164,13 @@ public class MovieController {
 		List<Rating> ratings = ratingRepository.findAll();
 		List<Rating> ratingsListFilteredOnMovie = ratings.stream()
 				.filter(p->p.getMovie().getName().equals(movie.getName())).collect(Collectors.toList());
-		int maxRatings = ratingsListFilteredOnMovie.stream().mapToInt(m->m.getValue()).max().getAsInt();
-		double averageRatingOfMovie = ratings.stream().mapToInt(mm->mm.getValue()).average().getAsDouble();
+		int maxRatings = ratingsListFilteredOnMovie.stream().mapToInt(Rating::getValue).max().getAsInt();
+		double averageRatingOfMovie = ratings.stream().mapToInt(Rating::getValue).average().getAsDouble();
 		List<Rating> ratingsHighestRated = ratingsListFilteredOnMovie.stream().filter(p->p.getValue()==maxRatings).collect(Collectors.toList());
 		ArrayList<Customer> personList= new ArrayList<>();
 		ratingsHighestRated.stream().forEach(p->{
 			Customer customer=customerRepository.findOne(p.getCustomerId());
-			double averageRatingOfUser =ratings.stream().filter(rating->rating.getCustomerId()==customerId).mapToInt(map->map.getValue()).average().getAsDouble();
+			double averageRatingOfUser =ratings.stream().filter(rating->rating.getCustomerId()==customerId).mapToInt(Rating::getValue).average().getAsDouble();
 			customer.setCustomerAverageRating(averageRatingOfUser);
 			customer.setMovieAverageRating(averageRatingOfMovie);
 			personList.add(customer);
