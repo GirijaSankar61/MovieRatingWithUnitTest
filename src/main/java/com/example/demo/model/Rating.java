@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.model;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;

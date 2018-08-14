@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class HsqlDemo1Application {
+public class SpringBootApplicationBootStrap {
 
 	public static void main(String[] args) {
-		SpringApplication.run(HsqlDemo1Application.class, args);
+		SpringApplication.run(SpringBootApplicationBootStrap.class, args);
 	}
 	
 }

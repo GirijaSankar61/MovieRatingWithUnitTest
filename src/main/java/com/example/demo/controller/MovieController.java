@@ -1,11 +1,9 @@
-package com.example.demo;
+package com.example.demo.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -19,8 +17,21 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/rest")
-public class RestController {
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.model.Customer;
+import com.example.demo.model.Movie;
+import com.example.demo.model.Rating;
+import com.example.demo.repository.CustomerRepository;
+import com.example.demo.repository.MovieRepository;
+import com.example.demo.repository.RatingRepository;
+
+@RestController
+@RequestMapping("/rest")
+public class MovieController {
 	@Inject
 	private CustomerRepository customerRepository;
 
@@ -30,9 +41,8 @@ public class RestController {
 	@Inject
 	RatingRepository ratingRepository;
 
-	@Path("/hello")
-	@GET
-	@Produces("text/plain")
+
+	@GetMapping("/hello")
 	public String getHello() {
 		Customer c1 = new Customer(1l, "Ram", "sahu");
 		Customer c2 = new Customer(2l, "Ram2", "sahu");
@@ -51,24 +61,17 @@ public class RestController {
 		return "Hello World!";
 	}
 
-	@Path("/all")
-	@GET
-	@Produces("application/json")
+	@GetMapping("/all")
 	public List<Customer> getAll() {
 		return customerRepository.findAll();
 	}
 
-	//
-	@Path("/movie/all")
-	@GET
-	@Produces("application/json")
+	@GetMapping("/movie/all")
 	public Movie getMovie() {
 		return movieRepository.findOne(1l);
 	}
 
-	@Path("/rating")
-	@GET
-	@Produces("application/json")
+	@GetMapping("/rating")
 	public List<Rating> setRating() {
 		Movie m = new Movie("DOn1");
 		Movie m2 = new Movie("DOn2");
@@ -86,13 +89,10 @@ public class RestController {
 		ratingList.add(r5);
 
 		ratingRepository.save(ratingList);
-		// Rating one = ratingRepository.findOne(1l);
-		// System.out.println(one.toString());
 		return ratingRepository.findAll();
 	}
 
-	@Path("/customer/{customerId}/rate/{rating}")
-	@GET
+	@GetMapping("/customer/{customerId}/rate/{rating}")
 	public Response saveRating(@PathParam(value = "customerId") long customerId, @PathParam(value = "rating") int value,
 			@HeaderParam(value = "movie") String movieName) {
 		Rating r = null;
@@ -107,9 +107,7 @@ public class RestController {
 		return Response.ok(r, MediaType.APPLICATION_JSON).build();
 	}
 
-	@Path("/highestRatedMovie/imperative")
-	@GET
-	@Produces("application/json")
+	@GetMapping("/highestRatedMovie/imperative")
 	public Response highestRatedMovie() {
 		Movie highestAverageMovie = null;
 		double highestAvg = 0;
@@ -145,9 +143,7 @@ public class RestController {
 		}
 	}
 
-	@Path("/highestRatedMovie/functional")
-	@GET
-	@Produces("application/json")
+	@PostMapping("/highestRatedMovie/functional")
 	public Response highestRatedMovieInFunctionalType() {
 		List<Rating> ratings = ratingRepository.findAll();
 		double highRatingValue = 0;
@@ -170,10 +166,7 @@ public class RestController {
 		}
 	}
 	
-	@Path("/highestRatedCustomer/{id}")
-	@POST
-	@Consumes("application/json")
-	@Produces("application/json")
+	@PostMapping("/highestRatedCustomer/{id}")
 	public Response highestRatedGivenByCustomerForMovie(Movie movie,@PathParam(value = "id") long customerId) {
 		List<Rating> ratings = ratingRepository.findAll();
 		List<Rating> ratingsListFilteredOnMovie = ratings.stream()
