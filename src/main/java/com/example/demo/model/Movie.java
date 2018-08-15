@@ -13,8 +13,6 @@ public class Movie {
 	private Long id;
 	private String name;
 	
-//	@OneToMany(mappedBy = "movie")
-//	private Set<Rating> ratings;
 
 	public Long getId() {
 		return id;
@@ -32,13 +30,6 @@ public class Movie {
 		this.name = name;
 	}
 
-//	public Set<Rating> getRatings() {
-//		return ratings;
-//	}
-//
-//	public void setRatings(Set<Rating> ratings) {
-//		this.ratings = ratings;
-//	}
 
 	@Override
 	public String toString() {

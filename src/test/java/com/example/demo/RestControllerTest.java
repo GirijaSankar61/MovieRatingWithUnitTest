@@ -4,7 +4,10 @@
 package com.example.demo;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import javax.ws.rs.core.MediaType;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,6 +21,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.example.demo.controller.MovieController;
+import com.example.demo.model.Movie;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Ultron
@@ -71,6 +76,18 @@ public class RestControllerTest {
 	@Test
 	public void testSaveRating() throws Exception {
 		restLogsMockMvc.perform(get("/rest/customer/2/rate/3").header("movie", "Don")).andExpect(status().isOk());
+	}
+	
+	@Test
+	public void testHighestRatedCustomer() throws Exception {
+		movieController.loadCustomer();
+		movieController.loadRating();
+		Movie m = new Movie("DOn1");
+		m.setId(1l);
+		ObjectMapper mapper = new ObjectMapper();
+		String json = mapper.writeValueAsString(m);
+		restLogsMockMvc.perform(post("/rest/highestRatedCustomer/2")
+				.contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(status().isOk());
 	}
 
 }

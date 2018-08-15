@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,7 +44,7 @@ public class MovieController {
 		Customer c2 = new Customer(2l, "Amir", "Khan");
 		Customer c3 = new Customer(3l, "Shah", "Feku");
 		Customer c4 = new Customer(4l, "Salu", "saMhu");
-		List<Customer> list = new ArrayList<Customer>();
+		List<Customer> list = new ArrayList<>();
 		list.add(c1);
 		list.add(c2);
 		list.add(c3);
@@ -106,7 +107,7 @@ public class MovieController {
 		Movie highestAverageMovie = null;
 		double highestAvg = 0;
 		List<Rating> ratings = ratingRepository.findAll();
-		HashMap<Movie, List<Rating>> map = new HashMap<Movie, List<Rating>>();
+		HashMap<Movie, List<Rating>> map = new HashMap<>();
 		for (Rating rating : ratings) {
 			if (map.containsKey(rating.getMovie())) {
 				List<Rating> ratingList = map.get(rating.getMovie());
@@ -149,8 +150,8 @@ public class MovieController {
 		}
 	}
 
-	@PostMapping("/highestRatedCustomer/{id}")
-	public ResponseEntity highestRatedGivenByCustomerForMovie(Movie movie, @PathVariable(value = "id") Long customerId) {
+	@PostMapping(value="/highestRatedCustomer/{id}")
+	public ResponseEntity highestRatedGivenByCustomerForMovie(@RequestBody Movie movie, @PathVariable(value = "id") Long customerId) {
 		List<Rating> ratings = ratingRepository.findAll();
 		List<Rating> ratingsListFilteredOnMovie = ratings.stream()
 				.filter(p -> p.getMovie().getName().equals(movie.getName())).collect(Collectors.toList());
