@@ -31,7 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SpringBootApplicationBootStrap.class)
 @WebAppConfiguration
-public class RestControllerTest {
+public class MovieControllerIntegrationTest {
 
 	private MockMvc restLogsMockMvc;
 

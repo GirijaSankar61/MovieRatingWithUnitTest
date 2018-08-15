@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -83,11 +85,13 @@ public class MovieController {
 		ratingRepository.save(ratingList);
 		return ratingRepository.findAll();
 	}
-/**
- * Use ResponseEntity to get the appropriate response i.e-only response body
- * Response can be used as output but it will give complete and unnecessary information
- * 
- * */
+
+	/**
+	 * Use ResponseEntity to get the appropriate response i.e-only response body
+	 * Response can be used as output but it will give complete and unnecessary
+	 * information
+	 * 
+	 */
 	@GetMapping(value = "/customer/{customerId}/rate/{rating}")
 	public ResponseEntity saveRating(@PathVariable(value = "customerId") Long customerId,
 			@PathVariable(value = "rating") Integer value, @RequestHeader(value = "movie") String movieName) {
@@ -129,7 +133,7 @@ public class MovieController {
 			}
 		}
 		if (highestAverageMovie == null) {
-			return new ResponseEntity<>("No Review found for any movie",HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>("No Review found for any movie", HttpStatus.NOT_FOUND);
 		} else {
 			return new ResponseEntity<>(highestAverageMovie, HttpStatus.OK);
 		}
@@ -142,16 +146,22 @@ public class MovieController {
 				.collect(Collectors.groupingBy(Rating::getMovie));
 		Map<Movie, Double> avarage = ratingsGroupByMovie.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
 				e -> e.getValue().stream().mapToInt(Rating::getValue).average().getAsDouble()));
-		Movie highestAverageMovie = avarage.entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
+		Movie highestAverageMovie = null;
+		Optional<Entry<Movie, Double>> maxHighestRatedMovie = avarage.entrySet().stream()
+				.max(Map.Entry.comparingByValue());
+		if(maxHighestRatedMovie.isPresent()) {
+			highestAverageMovie=maxHighestRatedMovie.get().getKey();
+		}
 		if (highestAverageMovie == null) {
-			return new ResponseEntity<>("No Review found for any movie",HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>("No Review found for any movie", HttpStatus.NOT_FOUND);
 		} else {
 			return new ResponseEntity<>(highestAverageMovie, HttpStatus.OK);
 		}
 	}
 
-	@PostMapping(value="/highestRatedCustomer/{id}")
-	public ResponseEntity highestRatedGivenByCustomerForMovie(@RequestBody Movie movie, @PathVariable(value = "id") Long customerId) {
+	@PostMapping(value = "/highestRatedCustomer/{id}")
+	public ResponseEntity highestRatedGivenByCustomerForMovie(@RequestBody Movie movie,
+			@PathVariable(value = "id") Long customerId) {
 		List<Rating> ratings = ratingRepository.findAll();
 		List<Rating> ratingsListFilteredOnMovie = ratings.stream()
 				.filter(p -> p.getMovie().getName().equals(movie.getName())).collect(Collectors.toList());
