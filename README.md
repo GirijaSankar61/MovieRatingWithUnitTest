@@ -12,6 +12,10 @@ Here we allow spring to autowire or inject dependency like in real time.Here we 
 
 Docker with MYSQL
 ==================
-docker build -t myapp .
 
-docker run -p 5084:5055 myapp -e spring.datasource.username = <username> -e spring.datasource.password = <password> -e spring.datasource.url=jdbc:mysql://<your url>:<port no>/test?allowPublicKeyRetrieval=true&useSSL=false
+## Useful Docker commands
+
+-`docker build -t myapp .`
+</br>
+</br>
+-`docker run -p 5084:5055 myapp -e spring.datasource.username = //<username//> -e spring.datasource.password = <password> -e spring.datasource.url=jdbc:mysql://<your url>:<port no>/test?allowPublicKeyRetrieval=true&useSSL=false`
