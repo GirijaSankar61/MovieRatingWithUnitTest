@@ -9,3 +9,4 @@ Integration testing
 =============
 
 Here we allow spring to autowire or inject dependency like in real time.Here we are not directly mock the dependencies because actual object will be injected by spring.With the help of mockmvc we directly create get,post,put request and fetch response from our resources.
+
