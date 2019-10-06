@@ -1,3 +1,5 @@
+![CircleCI](https://img.shields.io/circleci/build/github/GirijaSankar61/MovieRatingWithUnitTest/featureBranch?token=799d33a3cef73bdab72f5c1e1cd577e9ab8703cf)
+
 Integration Testing as well as unit testing with spring boot application
 
 Unit testing
