@@ -1,4 +1,4 @@
-![CircleCI](https://img.shields.io/circleci/build/github/GirijaSankar61/MovieRatingWithUnitTest/master?token=5acbf8684c82fd2d51e613d7106125bb5a023bb7)
+![CircleCI](https://img.shields.io/circleci/build/github/GirijaSankar61/MovieRatingWithUnitTest/master?token=799d33a3cef73bdab72f5c1e1cd577e9ab8703cf)
 
 Integration Testing as well as unit testing with spring boot application
 
